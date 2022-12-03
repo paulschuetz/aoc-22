@@ -4,7 +4,7 @@ fun main() {
 
     val inputLines = readInputLines("day02")
     benchmark { solveDay02Part1(inputLines) }.also { println("Solution part one: $it") }
-    benchmark { solveDay02Part2(inputLines) }.also { println("Solution part one: $it") }
+    benchmark { solveDay02Part2(inputLines) }.also { println("Solution part two: $it") }
 }
 
 private fun solveDay02Part1(input: List<String>) =
@@ -12,10 +12,10 @@ private fun solveDay02Part1(input: List<String>) =
         val (opponentSign, mySign) = line.split(" ").map { it.first() }
         outcomeScore(
             outcome(
-                opponentShape = parseOpponentShape(opponentSign),
-                myShape = parseMyShape(mySign)
+                opponentShape = parseShape(opponentSign),
+                myShape = parseShape(mySign)
             )
-        ) + shapeScore(parseMyShape(mySign))
+        ) + shapeScore(parseShape(mySign))
     }
 
 fun solveDay02Part2(input: List<String>) =
@@ -23,7 +23,7 @@ fun solveDay02Part2(input: List<String>) =
         val (opponentSign, expectedOutcome) = line.split(" ").map { it.first() }
         shapeScore(
             calcShape(
-                parseOpponentShape(opponentSign),
+                parseShape(opponentSign),
                 parseExpectedOutcome(expectedOutcome)
             )
         ) + outcomeScore(parseExpectedOutcome(expectedOutcome))
@@ -37,20 +37,11 @@ enum class Outcome {
     WIN, LOSE, DRAW
 }
 
-private val parseMyShape = { shapeChar: Char ->
+private val parseShape = { shapeChar: Char ->
     when (shapeChar) {
-        'X' -> Shape.ROCK
-        'Y' -> Shape.PAPER
-        'Z' -> Shape.SCISSORS
-        else -> throw IllegalArgumentException("invalid shape code $shapeChar")
-    }
-}
-
-private val parseOpponentShape = { shapeChar: Char ->
-    when (shapeChar) {
-        'A' -> Shape.ROCK
-        'B' -> Shape.PAPER
-        'C' -> Shape.SCISSORS
+        'X', 'A' -> Shape.ROCK
+        'Y', 'B' -> Shape.PAPER
+        'Z', 'C' -> Shape.SCISSORS
         else -> throw IllegalArgumentException("invalid shape code $shapeChar")
     }
 }
@@ -88,26 +79,16 @@ private val parseExpectedOutcome = { c: Char ->
     }
 }
 
-private val getWinningShape = { shape: Shape ->
-    when (shape) {
-        Shape.ROCK -> Shape.PAPER
-        Shape.PAPER -> Shape.SCISSORS
-        Shape.SCISSORS -> Shape.ROCK
-    }
-}
-
-private val getLosingShape = { shape: Shape ->
-    when (shape) {
-        Shape.ROCK -> Shape.SCISSORS
-        Shape.PAPER -> Shape.ROCK
-        Shape.SCISSORS -> Shape.PAPER
-    }
-}
+val winningShape = mapOf(
+    Shape.ROCK to Shape.PAPER,
+    Shape.PAPER to Shape.SCISSORS,
+    Shape.SCISSORS to Shape.ROCK
+)
 
 private val calcShape = { opponentShape: Shape, expectedOutcome: Outcome ->
     when (expectedOutcome) {
-        Outcome.WIN -> getWinningShape(opponentShape)
-        Outcome.LOSE -> getLosingShape(opponentShape)
+        Outcome.WIN -> winningShape[opponentShape]!!
+        Outcome.LOSE -> winningShape.entries.associateBy({ it.value }) { it.key }[opponentShape]!!
         Outcome.DRAW -> opponentShape
     }
 }
