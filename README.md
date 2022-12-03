@@ -2,4 +2,4 @@
 
 Solutions are located at [src/main/kotlin](src/main/kotlin)
 
-Whishing all of you a blissful advent time and lots of fun at solving this years' puzzles! 🎄🍪🔔
+Whishing all of you a blissful advent time and lots of fun with this years' puzzles! 🎄🍪🔔
