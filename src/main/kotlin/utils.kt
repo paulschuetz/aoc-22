@@ -7,7 +7,7 @@ val benchmark = { block: () -> Unit ->
     measureTimeMillis(block).also { println("Took $it millis to compute.") }
 }
 
-val readInputLines = { filename: String -> File("src/main/resources/$filename").readLines() }
+fun readInputLines(filename: String) = File("src/main/resources/$filename").readLines()
 
 val readInput = { filename: String -> File("src/main/resources/$filename").readText() }
 

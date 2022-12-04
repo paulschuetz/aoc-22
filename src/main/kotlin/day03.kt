@@ -1,8 +1,8 @@
 fun main() {
     val inputLines = readInputLines("day03")
 
-    benchmark { solveDay03Part1(inputLines) }.also { println("Solution part one: $it") }
-    benchmark { solveDay03Part2(inputLines) }.also { println("Solution part two: $it") }
+    benchmark { solveDay03Part1(inputLines).also { println("Solution part one: $it") } }
+    benchmark { solveDay03Part2(inputLines).also { println("Solution part two: $it") } }
 }
 
 private fun solveDay03Part1(input: List<String>): Int =

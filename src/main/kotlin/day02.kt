@@ -3,8 +3,8 @@ fun main() {
     assertEquals(solveDay02Part2(readInputLines("day02-demo")), 12)
 
     val inputLines = readInputLines("day02")
-    benchmark { solveDay02Part1(inputLines) }.also { println("Solution part one: $it") }
-    benchmark { solveDay02Part2(inputLines) }.also { println("Solution part two: $it") }
+    benchmark { solveDay02Part1(inputLines).also { println("Solution part one: $it") } }
+    benchmark { solveDay02Part2(inputLines).also { println("Solution part two: $it") } }
 }
 
 private fun solveDay02Part1(input: List<String>) =
