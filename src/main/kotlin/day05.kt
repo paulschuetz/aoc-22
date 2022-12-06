@@ -40,7 +40,7 @@ private fun parseInstructions(rawInput: String): List<Instruction> {
 }
 
 private fun parseStacks(rawInput: String): Map<Int, Stack<Char>> {
-    val initialCratesInputLines = rawInput.split("\n").let { it.take(it.size - 1) }
+    val initialCratesInputLines = rawInput.split("\n").dropLast(1)
 
     val regex = Regex("[A-Z]")
     val stacks = mutableMapOf<Int, Stack<Char>>()
