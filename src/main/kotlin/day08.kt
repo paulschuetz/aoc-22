@@ -12,9 +12,11 @@ fun main() {
 private fun solveDay08Part1(input: List<String>): Int {
     val trees = input.flatMapIndexed { y, line -> line.mapIndexed { x, char -> Coordinate(x = x, y = y) to char.digitToInt() } }.toMap()
 
+    val width = input.size - 1
+
     val visibleInnerTreesCount =
         trees.filterNot { it.key.x == 0 || it.key.y == 0 || it.key.x == input.size - 1 || it.key.y == input.size - 1 }
-            .count { Tree(coordinate = it.key, height = it.value).isVisible(trees) }
+            .count { Tree(coordinate = it.key, height = it.value).isVisible(trees, width) }
 
     val visibleOuterTreesCount = (input.size - 1) * 4
 
@@ -38,60 +40,48 @@ data class Coordinate(val x: Int, val y: Int)
 
 data class Tree(val coordinate: Coordinate, val height: Int)
 
-private fun Tree.isVisible(trees: Map<Coordinate, Int>) =
-    trees.filter { it.key.x == this.coordinate.x && it.key.y < this.coordinate.y }.all { it.value < this.height } ||
-            trees.filter { it.key.x == this.coordinate.x && it.key.y > this.coordinate.y }.all { it.value < this.height } ||
-            trees.filter { it.key.y == this.coordinate.y && it.key.x < this.coordinate.x }.all { it.value < this.height } ||
-            trees.filter { it.key.y == this.coordinate.y && it.key.x > this.coordinate.x }.all { it.value < this.height }
+private fun Tree.isVisible(trees: Map<Coordinate, Int>, width: Int) = (this.coordinate.y - 1 downTo 0).map { trees[Coordinate(x = this.coordinate.x, y = it)]!! }.all { it < this.height } ||
+            (this.coordinate.y + 1..width).map { trees[Coordinate(x = this.coordinate.x, y = it)]!! }.all { it < this.height } ||
+            (this.coordinate.x - 1 downTo 0).map { trees[Coordinate(x = it, y = this.coordinate.y)]!! }.all { it < this.height } ||
+            (this.coordinate.x + 1..width).map { trees[Coordinate(x = it, y = this.coordinate.y)]!! }.all { it < this.height }
 
-private fun Tree.calcScenicScore(trees: Map<Coordinate, Int>, inputWidth: Int): Int {
+fun Tree.calcScenicScore(trees: Map<Coordinate, Int>, inputWidth: Int): Int {
 
-    val sideScores = mutableListOf<Int>()
-
-    // left
-    var currentSideScenicScore = 0
+    var leftScore = 0
     for (x in this.coordinate.x - 1 downTo 0) {
-        if (trees[Coordinate(x = x, y = this.coordinate.y)]!! < this.height) currentSideScenicScore++
+        if (trees[Coordinate(x = x, y = this.coordinate.y)]!! < this.height) leftScore++
         if (trees[Coordinate(x = x, y = this.coordinate.y)]!! >= this.height) {
-            currentSideScenicScore++
+            leftScore++
             break
         }
     }
-    sideScores.add(currentSideScenicScore)
-    currentSideScenicScore = 0
 
-    // right
+    var rightScore = 0
     for (x in this.coordinate.x + 1..inputWidth) {
-        if (trees[Coordinate(x = x, y = this.coordinate.y)]!! < this.height) currentSideScenicScore++
+        if (trees[Coordinate(x = x, y = this.coordinate.y)]!! < this.height) rightScore++
         if (trees[Coordinate(x = x, y = this.coordinate.y)]!! >= this.height) {
-            currentSideScenicScore++
+            rightScore++
             break
         }
     }
-    sideScores.add(currentSideScenicScore)
-    currentSideScenicScore = 0
 
-    // up
+    var topScore = 0
     for (y in this.coordinate.y - 1 downTo 0) {
-        if (trees[Coordinate(x = this.coordinate.x, y = y)]!! < this.height) currentSideScenicScore++
+        if (trees[Coordinate(x = this.coordinate.x, y = y)]!! < this.height) topScore++
         if (trees[Coordinate(x = this.coordinate.x, y = y)]!! >= this.height) {
-            currentSideScenicScore++
+            topScore++
             break
         }
     }
-    sideScores.add(currentSideScenicScore)
-    currentSideScenicScore = 0
 
-    // down
+    var downScore = 0
     for (y in this.coordinate.y + 1..inputWidth) {
-        if (trees[Coordinate(x = this.coordinate.x, y = y)]!! < this.height) currentSideScenicScore++
+        if (trees[Coordinate(x = this.coordinate.x, y = y)]!! < this.height) downScore++
         if (trees[Coordinate(x = this.coordinate.x, y = y)]!! >= this.height) {
-            currentSideScenicScore++
+            downScore++
             break
         }
     }
-    sideScores.add(currentSideScenicScore)
 
-    // calc final scenic score for tree
-    return sideScores.reduce { a, b -> a * b }
+    return topScore * rightScore * downScore * leftScore
 }

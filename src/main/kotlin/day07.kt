@@ -15,7 +15,7 @@ private fun solveDay07Part1(input: String): Int {
     val rootFolder = Folder("/")
     commands.fold(rootFolder) { folder, command -> applyCommand(folder, command) }
 
-    val folders = rootFolder.allSubfolders() + rootFolder
+    val folders = rootFolder.allSubfolders()
     return folders.map { it.size() }.filter { it <= 100000 }.sum()
 }
 
@@ -25,7 +25,7 @@ private fun solveDay07Part2(input: String): Int {
     val rootFolder = Folder("/")
     commands.fold(rootFolder) { folder, command -> applyCommand(folder, command) }
 
-    val folders = rootFolder.allSubfolders() + rootFolder
+    val folders = rootFolder.allSubfolders()
 
     val totalDiskSpace = 70000000
     val needed = 30000000
@@ -71,14 +71,14 @@ fun changeDir(folder: Folder, cdCommand: String): Folder {
 fun listContents(folder: Folder, lsCommand: String): Folder {
     lsCommand.split("\n").drop(1).forEach { line ->
         when {
-            line.first().isDigit() -> folder.files.add(parseFile(root = folder, line))
+            line.first().isDigit() -> folder.files.add(parseFile(line))
             else -> folder.folders.add(Folder(name = line.split(" ")[1], parent = folder))
         }
     }
     return folder
 }
 
-fun parseFile(root: Folder, line: String): File {
+fun parseFile(line: String): File {
     val (size, name) = line.split(" ")
     return File(name = name, size = size.toInt())
 }
