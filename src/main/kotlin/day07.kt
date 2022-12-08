@@ -28,14 +28,22 @@ private fun solveDay07Part2(input: String): Int {
     val folders = rootFolder.allSubfolders() + rootFolder
 
     val totalDiskSpace = 70000000
-    val needed =         30000000
+    val needed = 30000000
     val obtained = rootFolder.size()
     val free = totalDiskSpace - obtained
     val minSpaceToBeFreed = needed - free
 
-    val dirSize = folders.map { it.size() }.filter { it >= minSpaceToBeFreed }.min()
-    return dirSize
+    return folders.map { it.size() }.filter { it >= minSpaceToBeFreed }.min()
 }
+
+class Folder(
+    val name: String,
+    val parent: Folder? = null,
+    val files: MutableSet<File> = mutableSetOf(),
+    val folders: MutableSet<Folder> = mutableSetOf()
+)
+
+class File(val name: String, val size: Int)
 
 fun applyCommand(folder: Folder, command: String): Folder {
     return when {
@@ -68,12 +76,11 @@ fun listContents(folder: Folder, lsCommand: String): Folder {
         }
     }
     return folder
-
 }
 
 fun parseFile(root: Folder, line: String): File {
     val (size, name) = line.split(" ")
-    return File(name = name, parent = root, size = size.toInt())
+    return File(name = name, size = size.toInt())
 }
 
 fun Folder.root(): Folder {
@@ -88,14 +95,5 @@ fun Folder.allSubfolders(): Set<Folder> {
     return if (this.folders.size == 0) setOf(this)
     else return setOf(this) + this.folders.flatMap { it.allSubfolders() }.toSet()
 }
-
-class Folder(
-    val name: String,
-    val parent: Folder? = null,
-    val files: MutableSet<File> = mutableSetOf(),
-    val folders: MutableSet<Folder> = mutableSetOf()
-)
-
-class File(val name: String, val parent: Folder, val size: Int)
 
 
