@@ -2,7 +2,6 @@ import kotlin.math.abs
 import kotlin.math.sign
 
 fun main() {
-
     val demoInputLines = readInputLines("day09-demo-part2")
     assertEquals(solveDay09Part2(demoInputLines), 36)
 
@@ -18,15 +17,13 @@ private fun solveDay09Part2(input: List<String>): Int {
 
     val visited = mutableSetOf(Coordinate(0, 0))
 
-    val finalPos = input.fold(startingPoints) { acc, command ->
+    input.fold(startingPoints) { acc, command ->
         applyMoveOperationToAllKnots(
             knotsStartPosition = acc,
             command = command,
             visited = visited
         )
     }
-
-    println("Final position is $finalPos and we visited ${visited.size} unique coordinates.")
 
     return visited.size
 }
