@@ -40,30 +40,26 @@ fun applyMoveOperationToAllKnots(
     return IntRange(1, times.toInt()).fold(knotsStartPosition) { acc, _ ->
         // after we move the head we move all other
         val newHead = moveHead(acc.first(), direction.first())
-        val k1 = follow(acc[1], newHead)
-        val k2 = follow(acc[2], k1)
-        val k3 = follow(acc[3], k2)
-        val k4 = follow(acc[4], k3)
-        val k5 = follow(acc[5], k4)
-        val k6 = follow(acc[6], k5)
-        val k7 = follow(acc[7], k6)
-        val k8 = follow(acc[8], k7)
-        val k9 = follow(acc[9], k8)
+        val k1 = acc[1] follow newHead
+        val k2 = acc[2] follow k1
+        val k3 = acc[3] follow k2
+        val k4 = acc[4] follow k3
+        val k5 = acc[5] follow k4
+        val k6 = acc[6] follow k5
+        val k7 = acc[7] follow k6
+        val k8 = acc[8] follow k7
+        val k9 = acc[9] follow k8
         visited.add(k9)
         listOf(newHead, k1, k2, k3, k4, k5, k6, k7, k8, k9)
     }
 }
 
-fun follow(tail: Coordinate, head: Coordinate): Coordinate {
-    val dx = head.x - tail.x
-    val dy = head.y - tail.y
-    return when {
-        abs(dx) <= 1 && abs(dy) <= 1 -> tail
-        abs(dx) < abs(dy) -> Coordinate(x = head.x, head.y - dy.sign)
-        abs(dx) > abs(dy) -> Coordinate(head.x - dx.sign, head.y)
-        // needed for part 2 diagonal scenario
-        else -> Coordinate(head.x - dx.sign, head.y - dy.sign)
-    }
+infix fun Coordinate.follow(head: Coordinate): Coordinate {
+    val dx = head.x - this.x
+    val dy = head.y - this.y
+
+    return if (abs(dx) <= 1 && abs(dy) <= 1) this
+    else this + Coordinate(dx.sign, dy.sign)
 }
 
 fun moveHead(coordinate: Coordinate, direction: Char): Coordinate = when (direction) {

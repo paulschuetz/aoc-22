@@ -36,7 +36,9 @@ private fun solveDay08Part2(input: List<String>): Int {
     return optimalTree.second
 }
 
-data class Coordinate(val x: Int, val y: Int)
+data class Coordinate(val x: Int, val y: Int){
+    operator fun plus(other: Coordinate) = Coordinate(other.x + x, other.y + y)
+}
 
 data class Tree(val coordinate: Coordinate, val height: Int)
 
