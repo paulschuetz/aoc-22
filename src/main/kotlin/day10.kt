@@ -24,7 +24,7 @@ sealed interface Operation {
 private fun solvePart1(input: List<String>): Int {
     val ticks = input.map { parseOperation(line = it.trim()) }
         .scan(Pair(emptyList<Int>(), 1)) { prevOpRes, op ->
-            processOperation(op = op, registerNum = prevOpRes.second)
+            processOperation(op = op, spritePos = prevOpRes.second)
         }.flatMap { it.first }
 
     val relevantCyclesNum = (ticks.size - 20).floorDiv(40) + 1
@@ -36,7 +36,7 @@ private fun solvePart1(input: List<String>): Int {
 private fun solvePart2(input: List<String>) {
     input.map { parseOperation(line = it.trim()) }
         .scan(Pair(emptyList<Int>(), 1)) { prevOpRes, op ->
-            processOperation(op = op, registerNum = prevOpRes.second)
+            processOperation(op = op, spritePos = prevOpRes.second)
         }.flatMap { it.first }
         .mapIndexed { index, spritePos ->
             if (listOf(spritePos - 1, spritePos, spritePos + 1).contains(index % 40)) "#" else ' '
@@ -45,13 +45,13 @@ private fun solvePart2(input: List<String>) {
         }
 }
 
-private fun processOperation(op: Operation, registerNum: Int): Pair<List<Int>, Int> {
+private fun processOperation(op: Operation, spritePos: Int): Pair<List<Int>, Int> {
     return when (op) {
         is Operation.MoveSpriteOp -> {
-            val ticks = listOf(registerNum, registerNum)
-            return Pair(ticks, registerNum + op.offset)
+            val ticks = listOf(spritePos, spritePos)
+            return Pair(ticks, spritePos + op.offset)
         }
-        else -> Pair(listOf(registerNum), registerNum)
+        else -> Pair(listOf(spritePos), spritePos)
     }
 }
 
