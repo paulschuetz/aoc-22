@@ -1,14 +1,26 @@
+package day00
+
+import assertEquals
+import benchmark
+import readInputLines
+
 fun main() {
-    val demoInputLines = readInputLines("day00-demo")
-    assertEquals(solveDay00Part1(demoInputLines), 1337)
+    val day = "00"
 
-    // val inputLines = readInputLines("day00")
-    // benchmark { solveDay00Part1(inputLines).also { println("Solution part one: $it") } }
+    val demoInputLines = readInputLines("day$day-demo")
+    assertEquals(solvePart1(demoInputLines), demoInputLines.size)
 
-    // assertEquals(solveDay00Part2(demoInputLines), 1337)
-    // benchmark { solveDay00Part2(inputLines).also { println("Solution part two: $it") } }
+    val inputLines = readInputLines("day$day")
+    benchmark { solvePart1(inputLines).also { println("Solution part one: $it") } }
+
+//     assertEquals(solvePart2(demoInputLines), demoInputLines.size)
+//     benchmark { solvePart2(inputLines).also { println("Solution part two: $it") } }
 }
 
-private fun solveDay00Part1(input: List<String>): Int = throw NotImplementedError()
+private fun solvePart1(input: List<String>): Int {
+    return input.size
+}
 
-private fun solveDay00Part2(input: List<String>): Int = throw NotImplementedError()
+private fun solvePart2(input: List<String>): Int {
+    return input.size
+}
