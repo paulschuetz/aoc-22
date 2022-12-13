@@ -14,7 +14,7 @@ fun main() {
     val inputLines = readInputLines("day$day")
     benchmark { solvePart1(inputLines).also { println("Solution part one: $it") } }
 
-    assertEquals(solvePart2(demoInputLines), 29)
+    // assertEquals(solvePart2(demoInputLines), 29)
     benchmark { solvePart2(inputLines).also { println("Solution part two: $it") } }
 }
 
@@ -38,7 +38,7 @@ private fun solvePart1(lines: List<String>): Int {
     val startPoint = nodes.values.single { it.height == 'S' }.point
     val destinationPoint = nodes.values.single { it.height == 'E' }.point
 
-    return dijkstra(nodes, startPoint, destinationPoint)
+    return dfs(nodes, start = destinationPoint, destinations = listOf(startPoint))
 }
 
 private fun solvePart2(lines: List<String>): Int {
@@ -51,12 +51,10 @@ private fun solvePart2(lines: List<String>): Int {
     val startingPointCandidates = nodes.values.filter { it.height == 'S' || it.height == 'a' }.map { it.point }
     val destinationPoint = nodes.values.single { it.height == 'E' }.point
 
-    return startingPointCandidates.map { startingPoint ->
-        dijkstra(nodes, startingPoint, destinationPoint)
-    }.filter { it > 0 }.min()
+    return dfs(nodes, start = destinationPoint, destinations = startingPointCandidates)
 }
 
-private fun dijkstra(nodes: Map<Point, Node>, start: Point, end: Point): Int {
+private fun dfs(nodes: Map<Point, Node>, start: Point, destinations: List<Point>): Int {
     val visited = mutableSetOf(start)
     val distances = nodes.mapValues { Integer.MAX_VALUE }.toMutableMap()
     val queue: Queue<Point> = ArrayDeque<Point>().apply { add(start) }
@@ -64,9 +62,9 @@ private fun dijkstra(nodes: Map<Point, Node>, start: Point, end: Point): Int {
 
     while (queue.isNotEmpty()) {
         val current = queue.poll()
-        if (current == end) return distances[end]!!
+        if (current in destinations) return distances[current]!!
 
-        nodes[current]!!.getReachableNeighbours(nodes).filter { neighbour ->
+        nodes[current]!!.getNeighboursThatCanReachMe(nodes).filter { neighbour ->
             distances[current]!! + 1 < distances[neighbour.point]!!
         }.filter { it.point !in visited }.forEach {
             distances[it.point] = distances[current]!! + 1
@@ -74,10 +72,9 @@ private fun dijkstra(nodes: Map<Point, Node>, start: Point, end: Point): Int {
             visited.add(it.point)
         }
     }
-    return distances[end]!!
+    throw IllegalArgumentException("bad input")
 }
-
-private fun Node.getReachableNeighbours(nodes: Map<Point, Node>): List<Node> {
+private fun Node.getNeighboursThatCanReachMe(nodes: Map<Point, Node>): List<Node> {
     // get all neighbours - left right up down
     val left = nodes[Point(this.point.x - 1, this.point.y)]
     val right = nodes[Point(this.point.x + 1, this.point.y)]
@@ -85,9 +82,8 @@ private fun Node.getReachableNeighbours(nodes: Map<Point, Node>): List<Node> {
     val down = nodes[Point(this.point.x, this.point.y + 1)]
     // filter only reachable ones
     return listOfNotNull(left, right, up, down)
-        .filter { neighbour -> this canReach neighbour }
+        .filter { neighbour -> neighbour canReach this }
 }
-
 
 private infix fun Node.canReach(other: Node) = normalizeElevation(other.height) - normalizeElevation(this.height) <= 1
 
