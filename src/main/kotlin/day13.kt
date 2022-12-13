@@ -34,12 +34,8 @@ private fun solvePart2(input: List<String>): Int {
         .map { parsePacket(it) }
         .sortedWith { p1, p2 -> if ((p1 inRightOrderWith p2) == ORDER.WRONG) 1 else -1 }
 
-    val firstDivider = sorted.indexOfFirst { packet ->
-        packet.singleOrNull()?.let { it is List<*> && it.isNotEmpty() && it.first() == 2 } ?: false
-    } + 1
-    val secondDivider = sorted.indexOfFirst { packet ->
-        packet.singleOrNull()?.let { it is List<*> && it.isNotEmpty() && it.first() == 6 } ?: false
-    } + 1
+    val firstDivider = sorted.indexOfFirst { packet -> packet.singleOrNull()?.let { it is List<*> && it.isNotEmpty() && it.first() == 2 } ?: false } + 1
+    val secondDivider = sorted.indexOfFirst { packet -> packet.singleOrNull()?.let { it is List<*> && it.isNotEmpty() && it.first() == 6 } ?: false } + 1
 
     return firstDivider * secondDivider
 }
@@ -88,9 +84,7 @@ fun parsePacket(input: String): List<Any> {
                 if (stack.isNotEmpty()) stack.last().add(currentElement)
                 else return currentElement
             }
-            ',' -> if (currentNumDigits.isNotBlank()) stack.last()
-                .add(currentNumDigits.toInt().also { currentNumDigits = "" })
-
+            ',' -> if (currentNumDigits.isNotBlank()) stack.last().add(currentNumDigits.toInt().also { currentNumDigits = "" })
             else -> currentNumDigits = "$currentNumDigits$char"
         }
     }
