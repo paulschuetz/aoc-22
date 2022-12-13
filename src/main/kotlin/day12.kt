@@ -64,16 +64,17 @@ private fun dfs(nodes: Map<Point, Node>, start: Point, destinations: List<Point>
         val current = queue.poll()
         if (current in destinations) return distances[current]!!
 
-        nodes[current]!!.getNeighboursThatCanReachMe(nodes).filter { neighbour ->
-            distances[current]!! + 1 < distances[neighbour.point]!!
-        }.filter { it.point !in visited }.forEach {
-            distances[it.point] = distances[current]!! + 1
-            queue.add(it.point)
-            visited.add(it.point)
-        }
+        nodes[current]!!.getNeighboursThatCanReachMe(nodes)
+            .filter { it.point !in visited }
+            .forEach {
+                distances[it.point] = distances[current]!! + 1
+                queue.add(it.point)
+                visited.add(it.point)
+            }
     }
     throw IllegalArgumentException("bad input")
 }
+
 private fun Node.getNeighboursThatCanReachMe(nodes: Map<Point, Node>): List<Node> {
     // get all neighbours - left right up down
     val left = nodes[Point(this.point.x - 1, this.point.y)]

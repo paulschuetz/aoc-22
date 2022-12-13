@@ -78,8 +78,7 @@ fun parsePacket(input: String): List<Any> {
         when (char) {
             '[' -> stack.add(mutableListOf())
             ']' -> {
-                if (currentNumDigits.isNotEmpty()) stack.last()
-                    .add(currentNumDigits.toInt().also { currentNumDigits = "" })
+                if (currentNumDigits.isNotEmpty()) stack.last().add(currentNumDigits.toInt().also { currentNumDigits = "" })
                 val currentElement = stack.removeLast()
                 if (stack.isNotEmpty()) stack.last().add(currentElement)
                 else return currentElement
