@@ -16,3 +16,8 @@ fun <T: Any?> assertEquals(value: T, expected: T){
         throw RuntimeException("Expected value $expected but got $value")
     }
 }
+
+infix fun Int.toward(to: Int): IntProgression {
+    val step = if (this > to) -1 else 1
+    return IntProgression.fromClosedRange(this, to, step)
+}
