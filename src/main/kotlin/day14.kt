@@ -45,16 +45,16 @@ private fun solvePart1(input: List<String>): Int {
 
 private fun solvePart2(input: List<String>): Int {
 
-    val rocks = scanRocks(input).toMutableSet()
-    val maxY = rocks.maxOf { it.y }
+    val obstacles = scanRocks(input).toMutableSet()
+    val maxY = obstacles.maxOf { it.y }
     var restingSandCount = 0
     var sand = Point(500, 0)
 
     while (true) {
-        val movedSand = sand.move(obstacles = rocks, floorY = maxY + 2)
+        val movedSand = sand.move(obstacles = obstacles, floorY = maxY + 2)
 
         if (movedSand == sand) {
-            rocks += movedSand
+            obstacles += movedSand
             restingSandCount++
             if (movedSand == Point(500, 0)) return restingSandCount
             sand = Point(500, 0)
