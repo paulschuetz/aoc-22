@@ -14,8 +14,12 @@ val readInput = { filename: String -> File("src/main/resources/$filename").readT
 fun <T: Any?> assertEquals(value: T, expected: T){
     if (!Objects.equals(value, expected)){
         throw RuntimeException("Expected value $expected but got $value")
+    } else {
+        println("assertion succeeded")
     }
 }
+
+fun <T> Sequence<T>.repeat() = sequence { while (true) yieldAll(this@repeat) }
 
 infix fun Int.toward(to: Int): IntProgression {
     val step = if (this > to) -1 else 1

@@ -14,8 +14,8 @@ fun main() {
     val inputLines = readInputLines("day$day")
     benchmark { solvePart1(inputLines).also { println("Solution part one: $it") } }
 
-     assertEquals(solvePart2(demoInputLines), 1707)
-     benchmark { solvePart2(inputLines).also { println("Solution part two: $it") } }
+    assertEquals(solvePart2(demoInputLines), 1707)
+    benchmark { solvePart2(inputLines).also { println("Solution part two: $it") } }
 }
 
 private fun solvePart1(input: List<String>): Int {
@@ -39,40 +39,65 @@ private fun solvePart2(input: List<String>): Int {
             .map { otherValve -> (valve.name to otherValve.name) to dfs(valves, valve.name, otherValve.name) }
     }.toMap()
 
-    return maxPressureReleaseTogether(Pair("AA", "AA"), Pair(26, 26), relevantValves.filterKeys { it != "AA" }, shortestPaths)
+    val bestPaths = allPaths(
+        currentPath = Path(path = setOf("AA"), pressureRelease = 0),
+        remainingSeconds = 26,
+        closedValves = relevantValves.filterKeys { it != "AA" },
+        shortestPaths = shortestPaths
+    )
+        .map { path -> path.copy(path = path.path.filter { it != "AA" }.toSet()) }
+        .sortedByDescending { it.pressureRelease }
+
+    var max = 0
+
+    for (humanPath in bestPaths) {
+        if (humanPath.pressureRelease + bestPaths.first().pressureRelease < max) break
+        for (elePath in bestPaths.filter { path -> !path.path.any { it in humanPath.path } }) {
+            if (humanPath.pressureRelease + elePath.pressureRelease > max) {
+                max = humanPath.pressureRelease + elePath.pressureRelease
+            } else break
+        }
+    }
+
+    return max
 }
 
-operator fun <T: Any> Pair<T, T>.get(index: Int) = if(index == 0) this.first else this.second
+operator fun <T : Any> Pair<T, T>.get(index: Int) = if (index == 0) this.first else this.second
 
-fun maxPressureReleaseTogether(
-    positions: Pair<String, String>,
-    remainingSeconds: Pair<Int, Int>,
+data class Path(
+    val path: Set<String>,
+    val pressureRelease: Int
+)
+
+fun allPaths(
+    currentPath: Path,
+    remainingSeconds: Int,
     closedValves: Map<String, Valve>,
     shortestPaths: Map<Pair<String, String>, Int>,
-): Int {
-    var maxPressureRelease = 0
+): List<Path> {
 
-    val actor = if(remainingSeconds[0] > remainingSeconds[1]) 0 else 1
+    val subsequentPaths = mutableListOf(currentPath)
 
-    for (valve in closedValves.filterKeys { it != positions[actor] }.values) {
-        val pathLength = shortestPaths[positions[actor] to valve.name]!!
-        val newRemainingSeconds = remainingSeconds[actor] - pathLength - 1
+    for (valve in closedValves.filterKeys { it != currentPath.path.last() }.values) {
+        val pathLength = shortestPaths[currentPath.path.last() to valve.name]!!
+        val newRemainingSeconds = remainingSeconds - pathLength - 1
         if (newRemainingSeconds > 0) {
             // basically we try each path that is possible to go in 30 seconds and always open the valve
-            val pressureRelease = newRemainingSeconds * valve.flowRate + maxPressureReleaseTogether(
-                if (actor == 0) Pair(valve.name, positions[1]) else Pair(positions[0], valve.name),
-                if (actor == 0) Pair(newRemainingSeconds, remainingSeconds[1]) else Pair(remainingSeconds[0], newRemainingSeconds),
-                closedValves.filterKeys { it != valve.name },
-                shortestPaths,
+            val allSubsequentPathsFromSelectedValve = allPaths(
+                currentPath = Path(
+                    path = currentPath.path + valve.name,
+                    pressureRelease = currentPath.pressureRelease + newRemainingSeconds * valve.flowRate
+                ),
+                remainingSeconds = newRemainingSeconds,
+                closedValves = closedValves - valve.name,
+                shortestPaths = shortestPaths
             )
-            // if recursion stack comes back we always update with max pressure release for that subpath
-            if (pressureRelease > maxPressureRelease) {
-                maxPressureRelease = pressureRelease
-            }
+
+            subsequentPaths += allSubsequentPathsFromSelectedValve
         }
     }
     // we return once there are no more meaningful
-    return maxPressureRelease
+    return subsequentPaths
 }
 
 fun maxPressureRelease(
