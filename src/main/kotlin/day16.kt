@@ -39,20 +39,20 @@ private fun solvePart2(input: List<String>): Int {
             .map { otherValve -> (valve.name to otherValve.name) to dfs(valves, valve.name, otherValve.name) }
     }.toMap()
 
-    val bestPaths = allPaths(
-        currentPath = Path(path = setOf("AA"), pressureRelease = 0),
+    val bestPaths = allPossiblePaths(
+        currentPath = Path(valves = setOf("AA"), pressureRelease = 0),
         remainingSeconds = 26,
         closedValves = relevantValves.filterKeys { it != "AA" },
         shortestPaths = shortestPaths
     )
-        .map { path -> path.copy(path = path.path.filter { it != "AA" }.toSet()) }
+        .map { path -> path.copy(valves = path.valves.filter { it != "AA" }.toSet()) }
         .sortedByDescending { it.pressureRelease }
 
     var max = 0
 
     for (humanPath in bestPaths) {
         if (humanPath.pressureRelease + bestPaths.first().pressureRelease < max) break
-        for (elePath in bestPaths.filter { path -> !path.path.any { it in humanPath.path } }) {
+        for (elePath in bestPaths.filter { path -> !path.valves.any { it in humanPath.valves } }) {
             if (humanPath.pressureRelease + elePath.pressureRelease > max) {
                 max = humanPath.pressureRelease + elePath.pressureRelease
             } else break
@@ -65,11 +65,11 @@ private fun solvePart2(input: List<String>): Int {
 operator fun <T : Any> Pair<T, T>.get(index: Int) = if (index == 0) this.first else this.second
 
 data class Path(
-    val path: Set<String>,
+    val valves: Set<String>,
     val pressureRelease: Int
 )
 
-fun allPaths(
+fun allPossiblePaths(
     currentPath: Path,
     remainingSeconds: Int,
     closedValves: Map<String, Valve>,
@@ -78,25 +78,24 @@ fun allPaths(
 
     val subsequentPaths = mutableListOf(currentPath)
 
-    for (valve in closedValves.filterKeys { it != currentPath.path.last() }.values) {
-        val pathLength = shortestPaths[currentPath.path.last() to valve.name]!!
+    for (valve in closedValves.filterKeys { it != currentPath.valves.last() }.values) {
+        val pathLength = shortestPaths[currentPath.valves.last() to valve.name]!!
         val newRemainingSeconds = remainingSeconds - pathLength - 1
         if (newRemainingSeconds > 0) {
-            // basically we try each path that is possible to go in 30 seconds and always open the valve
-            val allSubsequentPathsFromSelectedValve = allPaths(
+            // basically we compute each valve path that is possible to travel in t seconds
+            val allSubsequentPathsFromSelectedValve = allPossiblePaths(
                 currentPath = Path(
-                    path = currentPath.path + valve.name,
+                    valves = currentPath.valves + valve.name,
                     pressureRelease = currentPath.pressureRelease + newRemainingSeconds * valve.flowRate
                 ),
                 remainingSeconds = newRemainingSeconds,
                 closedValves = closedValves - valve.name,
                 shortestPaths = shortestPaths
             )
-
             subsequentPaths += allSubsequentPathsFromSelectedValve
         }
     }
-    // we return once there are no more meaningful
+    // we return once there are no more valves to travel to or we have no more time to travel
     return subsequentPaths
 }
 

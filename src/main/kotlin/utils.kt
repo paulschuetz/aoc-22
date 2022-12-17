@@ -14,8 +14,6 @@ val readInput = { filename: String -> File("src/main/resources/$filename").readT
 fun <T: Any?> assertEquals(value: T, expected: T){
     if (!Objects.equals(value, expected)){
         throw RuntimeException("Expected value $expected but got $value")
-    } else {
-        println("assertion succeeded")
     }
 }
 
