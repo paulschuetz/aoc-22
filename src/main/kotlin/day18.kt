@@ -64,7 +64,7 @@ private fun solvePart2(input: List<String>): Int {
     // dfs flood fill
     while (queue.isNotEmpty()) {
         // check top, left, right, down, front, back if within bounds
-        // If it is surface, add to surface else push onto stack
+        // If it is surface, add to surface else append to queue and continue searching
         val currentPosition = queue.removeLast()
 
         val right = currentPosition.copy(x = currentPosition.x + 1)
