@@ -33,7 +33,6 @@ data class Inventory(
     val oreRobots: Int = 1,
     val clayRobots: Int = 0,
     val obsidianRobots: Int = 0,
-    val geodeRobot: Int = 0
 )
 
 data class SimulationState(
